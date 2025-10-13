@@ -25,4 +25,5 @@ COPY . .
 EXPOSE 8000
 
 # Comando por defecto para ejecutar Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "gestion_qr.wsgi"]
+
