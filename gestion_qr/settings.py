@@ -10,24 +10,30 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+"""
+Django settings for gestion_qr project.
+"""
+
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-
 
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SSECRET_KEY = os.getenv("SECRET_KEY", "clave-insegura") 
+SECRET_KEY = os.getenv("SECRET_KEY", "clave-insegura")
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0,169.254.132.2").split(",")
 
+# -------------------------------
+# APLICACIONES
+# -------------------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,11 +46,13 @@ INSTALLED_APPS = [
     'qr',
 ]
 
-
+# -------------------------------
+# MIDDLEWARE (orden correcto)
+# -------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -53,8 +61,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# -------------------------------
+# CONFIGURACIÓN DE URLS Y TEMPLATES
+# -------------------------------
 ROOT_URLCONF = 'gestion_qr.urls'
-
 
 TEMPLATES = [
     {
@@ -73,7 +83,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gestion_qr.wsgi.application'
 
-
+# -------------------------------
+# BASE DE DATOS (sqlite por defecto)
+# -------------------------------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -81,7 +93,9 @@ DATABASES = {
     }
 }
 
-
+# -------------------------------
+# VALIDADORES DE CONTRASEÑA
+# -------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -89,22 +103,32 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
+# -------------------------------
+# CONFIGURACIÓN LOCAL
+# -------------------------------
 LANGUAGE_CODE = 'es-ec'
 TIME_ZONE = 'America/Guayaquil'
 USE_I18N = True
 USE_TZ = True
 
-
-SSTATIC_URL = '/static/'
+# -------------------------------
+# STATICFILES (corrección final)
+# -------------------------------
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# -------------------------------
+# CORS
+# -------------------------------
+CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOW_ALL_ORIGINS = True  # Puedes restringirlo luego si el frontend tiene dominio fijo
-
-
+# -------------------------------
+# VARIABLE PERSONALIZADA PARA INVENTARIO_API
+# -------------------------------
 INVENTARIO_API = os.getenv("INVENTARIO_API", "http://localhost:8002/api/equipos/")
 
-
+# -------------------------------
+# DEFAULT AUTO FIELD
+# -------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
