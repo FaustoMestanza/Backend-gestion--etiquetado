@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código del proyecto
 COPY . .
-RUN python manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput && ls -l /app/staticfiles
 
 # Exponer el puerto del contenedor
 EXPOSE 8000
