@@ -21,6 +21,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar el código del proyecto
 COPY . .
 
+# ✅ Dar permisos de ejecución al entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
+# Exponer el puerto (necesario para Azure)
+EXPOSE 8000
 
-CMD python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 gestion_qr.wsgi
+# ✅ Usar entrypoint en lugar de CMD directo
+ENTRYPOINT ["/app/entrypoint.sh"]
