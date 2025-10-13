@@ -98,6 +98,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 CORS_ALLOW_ALL_ORIGINS = True  # Puedes restringirlo luego si el frontend tiene dominio fijo
