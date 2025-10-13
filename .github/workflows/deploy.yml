@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  # =========================
-  # 1️⃣ BUILD: Crear imagen Docker y subirla a Docker Hub
-  # =========================
+ 
+  #  BUILD: Crear imagen Docker y subirla a Docker Hub
+  
   build:
     runs-on: ubuntu-latest
     steps:
@@ -36,9 +36,9 @@ jobs:
       - name: Subir imagen a Docker Hub
         run: docker push faustomestanza/microservicio-gestionqr:latest
 
-  # =========================
-  # 2️⃣ TEST: Ejecutar tests (si los agregas)
-  # =========================
+  
+  #  TEST: Ejecutar tests 
+  
   test:
     runs-on: ubuntu-latest
     needs: build
@@ -53,9 +53,9 @@ jobs:
         run: |
           python manage.py test || echo "No hay tests definidos, continuaré"
 
-  # =========================
-  # 3️⃣ DEPLOY: Desplegar en Azure Web App
-  # =========================
+  
+  #  DEPLOY: Desplegar en Azure Web App
+ 
   deploy:
     runs-on: ubuntu-latest
     needs: test
