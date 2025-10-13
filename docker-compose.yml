@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  gestion_qr:
+    build: .
+    container_name: microservicio-gestionqr
+    ports:
+      - "8003:8000" # Puerto externo 8003 -> interno 8000
+    env_file:
+      - .env # Variables de entorno (por ejemplo INVENTARIO_API)
+    volumes:
+      - .:/app # Monta tu código local dentro del contenedor
+    command: >
+      python manage.py runserver 0.0.0.0:8000
