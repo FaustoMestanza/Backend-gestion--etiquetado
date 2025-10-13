@@ -14,25 +14,19 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-# ===============================
-# 🔹 Cargar variables desde .env
-# ===============================
+
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ===============================
-# 🔹 Configuración básica
-# ===============================
+
 SECRET_KEY = os.getenv("SECRET_KEY", "insecure-default-key")
 
 DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,0.0.0.0").split(",")
 
-# ===============================
-# 🔹 Aplicaciones instaladas
-# ===============================
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,9 +39,7 @@ INSTALLED_APPS = [
     'qr',
 ]
 
-# ===============================
-# 🔹 Middleware
-# ===============================
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -61,9 +53,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'gestion_qr.urls'
 
-# ===============================
-# 🔹 Templates
-# ===============================
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -81,11 +71,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gestion_qr.wsgi.application'
 
-# ===============================
-# 🔹 Base de datos
-# Este microservicio NO usa BD.
-# Se mantiene SQLite mínima para el admin.
-# ===============================
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -93,9 +79,7 @@ DATABASES = {
     }
 }
 
-# ===============================
-# 🔹 Validación de contraseñas
-# ===============================
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -103,31 +87,21 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ===============================
-# 🔹 Internacionalización
-# ===============================
+
 LANGUAGE_CODE = 'es-ec'
 TIME_ZONE = 'America/Guayaquil'
 USE_I18N = True
 USE_TZ = True
 
-# ===============================
-# 🔹 Archivos estáticos
-# ===============================
+
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ===============================
-# 🔹 CORS (para permitir acceso desde frontend)
-# ===============================
+
 CORS_ALLOW_ALL_ORIGINS = True  # Puedes restringirlo luego si el frontend tiene dominio fijo
 
-# ===============================
-# 🔹 Configuración Inventario API
-# ===============================
+
 INVENTARIO_API = os.getenv("INVENTARIO_API", "http://localhost:8002/api/equipos/")
 
-# ===============================
-# 🔹 Clave primaria por defecto
-# ===============================
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
