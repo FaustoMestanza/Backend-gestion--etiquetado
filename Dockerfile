@@ -8,7 +8,7 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Instalar dependencias del sistema necesarias (para qrcode, requests, whitenoise)
+# Instalar dependencias del sistema necesarias
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
@@ -21,14 +21,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar el código del proyecto
 COPY . .
 
-# Recolectar archivos estáticos
-RUN python manage.py collectstatic --noinput || true
 
-# Mostrar contenido para verificar que se generaron los estáticos (temporal)
-RUN echo "Contenido de staticfiles:" && ls -R /app/staticfiles || echo "No se encontró la carpeta staticfiles"
 
-# Exponer el puerto del contenedor
-EXPOSE 8000
-
-# Comando por defecto para ejecutar Django con Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "gestion_qr.wsgi"]
+CMD python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 gestion_qr.wsgi
