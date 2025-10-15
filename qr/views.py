@@ -1,80 +1,82 @@
-import qrcode, io, requests, traceback
-from django.http import HttpResponse
+import qrcode
+import io
+import base64
+import requests
+from django.http import JsonResponse
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
 
 INVENTARIO_API = settings.INVENTARIO_API.rstrip("/")
 
+
 class GenerarQRView(APIView):
     """
-    Vista de depuración: genera el QR y muestra detalles del error si algo falla.
+    Genera un código QR y registra el equipo en el microservicio de Inventario.
+    No usa autenticación ni validación previa.
     """
 
     def post(self, request):
         codigo = request.data.get("codigo")
         if not codigo:
-            return Response({"error": "Debe enviar un código alfanumérico"}, status=400)
+            return JsonResponse(
+                {"error": "Debe enviar un código alfanumérico"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
-            # --- PRUEBA DE CONEXIÓN AL INVENTARIO ---
-            check_url = f"{INVENTARIO_API}/?codigo={codigo}"
-            check = requests.get(check_url, timeout=30)
+            # 🔹 Crear directamente el equipo en Inventario
+            crear = requests.post(
+                f"{INVENTARIO_API}/",
+                json={"codigo": codigo},
+                timeout=15
+            )
 
-            # --- LOG DE ESTADO ---
-            print(f"[DEBUG] Verificando {check_url} -> {check.status_code}")
-
-            # Si no existe, crear
-            if check.status_code == 404 or not check.json():
-                crear_url = f"{INVENTARIO_API}/"
-                crear_data = {"codigo": codigo}
-                crear = requests.post(crear_url, json=crear_data, timeout=30)
-
-                print(f"[DEBUG] Creando {crear_url} -> {crear.status_code}")
-
-                if crear.status_code not in [200, 201]:
-                    return Response({
-                        "error": "No se pudo crear el equipo en Inventario",
+            if crear.status_code in [200, 201]:
+                estado = "registrado"
+            elif crear.status_code == 400:
+                estado = "ya existe"
+            else:
+                return JsonResponse(
+                    {
+                        "error": "No se pudo registrar en Inventario",
                         "codigo_http": crear.status_code,
-                        "detalle": crear.text,
-                        "endpoint": crear_url,
-                        "enviado": crear_data
-                    }, status=crear.status_code)
+                        "detalle": crear.text
+                    },
+                    status=crear.status_code
+                )
 
-        except requests.exceptions.Timeout:
-            return Response({
-                "error": "Timeout — el microservicio Inventario no respondió a tiempo",
-                "endpoint": INVENTARIO_API
-            }, status=504)
-
-        except requests.exceptions.ConnectionError as e:
-            return Response({
-                "error": "No se pudo conectar con el microservicio Inventario",
-                "detalle": str(e),
-                "endpoint": INVENTARIO_API
-            }, status=503)
-
-        except Exception as e:
-            tb = traceback.format_exc()
-            return Response({
-                "error": "Error inesperado",
-                "detalle": str(e),
-                "traceback": tb
-            }, status=500)
-
-        # --- GENERAR QR ---
-        try:
+            # 🔹 Generar QR en memoria (sin format="PNG")
             qr_img = qrcode.make(codigo)
             buffer = io.BytesIO()
-            qr_img.save(buffer, format="PNG")
+            qr_img.save(buffer)
             buffer.seek(0)
-            return HttpResponse(buffer.getvalue(), content_type="image/png")
 
+            # 🔹 Convertir QR a base64 (para Postman o Flutter)
+            qr_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
+            # 🔹 Respuesta JSON
+            return JsonResponse(
+                {
+                    "mensaje": f"Equipo '{codigo}' {estado} correctamente en Inventario.",
+                    "codigo": codigo,
+                    "qr_base64": qr_base64
+                },
+                status=status.HTTP_201_CREATED
+            )
+
+        except requests.exceptions.Timeout:
+            return JsonResponse(
+                {"error": "El microservicio de Inventario no respondió a tiempo."},
+                status=504
+            )
+        except requests.exceptions.ConnectionError:
+            return JsonResponse(
+                {"error": "No se pudo conectar con el microservicio de Inventario."},
+                status=503
+            )
         except Exception as e:
-            tb = traceback.format_exc()
-            return Response({
-                "error": "Error generando el QR",
-                "detalle": str(e),
-                "traceback": tb
-            }, status=500)
+            return JsonResponse(
+                {"error": f"Error inesperado: {str(e)}"},
+                status=500
+            )
