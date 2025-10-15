@@ -127,7 +127,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 # VARIABLE PERSONALIZADA PARA INVENTARIO_API
 # -------------------------------
 INVENTARIO_API = os.getenv("INVENTARIO_API", "http://localhost:8002/api/equipos/")
-AUTH_TOKEN = os.getenv("AUTH_TOKEN", "")
+#AUTH_TOKEN = os.getenv("AUTH_TOKEN", "")
 
 # -------------------------------
 # DEFAULT AUTO FIELD
